@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Ato da Fiscalização - Prefeitura de Astolfo Dutra</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- html2pdf.js para exportação direta em arquivo PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        /* Dimensões Exatas e Estilização da Folha A4 Oficial */
+        .a4-sheet {
+            width: 210mm;
+            min-height: 296mm;
+            max-height: 296mm;
+            background: #ffffff;
+            margin: 0 auto;
+            padding: 10mm 12mm;
+            box-sizing: border-box;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            color: #111827;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* Estilo das tabelas e blocos do formulário oficial */
+        .doc-section-title {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 9.5pt;
+            letter-spacing: 0.05em;
+            padding: 3.5px 8px;
+            text-transform: uppercase;
+            border: 1.5px solid #0f172a;
+            border-bottom: none;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .doc-box {
+            border: 1.5px solid #0f172a;
+            margin-bottom: 7px;
+            background-color: #fff;
+        }
+
+        .doc-row {
+            display: flex;
+            border-bottom: 1px solid #475569;
+        }
+        .doc-row:last-child {
+            border-bottom: none;
+        }
+
+        .doc-cell {
+            padding: 4px 7px;
+            border-right: 1px solid #475569;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .doc-cell:last-child {
+            border-right: none;
+        }
+
+        .doc-label {
+            font-size: 7.5pt;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            margin-bottom: 1px;
+            line-height: 1.1;
+        }
+
+        .doc-value {
+            font-size: 9.5pt;
+            font-weight: 600;
+            color: #000000;
+            min-height: 15px;
+            word-break: break-word;
+            line-height: 1.25;
+        }
+
+        /* Caixa de seleção estilo documento impresso */
+        .pdf-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 8.8pt;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            margin-right: 10px;
+        }
+
+        .pdf-checkbox-box {
+            width: 13px;
+            height: 13px;
+            border: 1.5px solid #0f172a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9pt;
+            font-weight: 900;
+            line-height: 1;
+            background: #fff;
+            color: #0f172a;
+        }
+
+        .pdf-checkbox-box.checked {
+            background-color: #0f172a;
+            color: #ffffff;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Pauta de linhas para a área de relato */
+        .lined-paper {
+            background-image: repeating-linear-gradient(
+                transparent,
+                transparent 21px,
+                #cbd5e1 21px,
+                #cbd5e1 22px
+            );
+            line-height: 22px;
+            font-size: 9.5pt;
+            padding-top: 1px;
+            min-height: 154px; /* 7 linhas exatas */
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .unlined-paper {
+            line-height: 1.45;
+            font-size: 9.5pt;
+            min-height: 154px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Responsividade do Preview A4 em telas menores */
+        @media (max-width: 1024px) {
+            .a4-preview-wrapper {
+                overflow-x: auto;
+                padding-bottom: 1rem;
+            }
+        }
+
+        /* Configuração estrita de impressão nativa (@media print) */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            html, body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 210mm;
+                height: 297mm;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: visible !important;
+            }
+            .a4-sheet {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 10mm 12mm !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- BARRA DE TOPO / CABEÇALHO DO SISTEMA -->
+    <header class="no-print bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+        <div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-inner">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-base sm:text-lg tracking-tight">Fiscalização Municipal • Astolfo Dutra</h1>
+                        <span class="hidden sm:inline-block bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs px-2 py-0.5 rounded-full font-medium">PDF Editável</span>
+                    </div>
+                    <p class="text-xs text-slate-400">Secretaria Municipal de Segurança Pública — Gerador de Ficha de Ato Administrativo</p>
+                </div>
+            </div>
+
+            <!-- Botões de Ação Principais -->
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openHistoryModal()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-2 border border-slate-700 transition">
+                    <i class="fa-solid fa-folder-open text-amber-400"></i>
+                    <span>Salvos (<span id="savedCountBadge">0</span>)</span>
+                </button>
+
+                <button onclick="saveCurrentToHistory()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-2 border border-slate-700 transition" title="Salvar rascunho no navegador">
+                    <i class="fa-solid fa-floppy-disk text-emerald-400"></i>
+                    <span class="hidden md:inline">Salvar</span>
+                </button>
+
+                <button onclick="resetFormConfirm()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-rose-950/60 hover:border-rose-700 text-slate-200 hover:text-rose-200 text-xs sm:text-sm font-medium flex items-center gap-2 border border-slate-700 transition" title="Limpar todos os campos">
+                    <i class="fa-solid fa-file-circle-plus text-rose-400"></i>
+                    <span class="hidden md:inline">Novo Ato</span>
+                </button>
+
+                <div class="h-6 w-px bg-slate-700 mx-1 hidden sm:block"></div>
+
+                <button onclick="window.print()" class="px-3.5 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-xs sm:text-sm font-semibold flex items-center gap-2 transition shadow">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Imprimir / Salvar PDF</span>
+                </button>
+
+                <button id="btnDownloadPdf" onclick="downloadDirectPDF()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Baixar PDF Preenchido</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL (SPLIT VIEW: FORMULÁRIO + FOLHA A4) -->
+    <main class="max-w-[1600px] mx-auto p-3 sm:p-6 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+        <!-- COLUNA ESQUERDA: PAINEL DE PREENCHIMENTO RÁPIDO -->
+        <section class="no-print xl:col-span-5 bg-white rounded-xl shadow-sm border border-slate-200/90 overflow-hidden">
+            
+            <!-- Abas ou Cabeçalho do Formulário -->
+            <div class="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-blue-600"></i>
+                    <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Painel de Preenchimento do Ato</h2>
+                </div>
+                <span class="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Logos V3 Ativas
+                </span>
+            </div>
+
+            <div class="p-5 space-y-6 max-h-[calc(100vh-140px)] overflow-y-auto">
+
+                <!-- BLOCO 0: CONFIGURAÇÃO DAS LOGOS DO CABEÇALHO -->
+                <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-3.5 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-blue-950 flex items-center gap-1.5">
+                            <i class="fa-solid fa-building-shield text-blue-600"></i>
+                            Logos do Cabeçalho Oficial
+                        </span>
+                        <button type="button" onclick="forceRestoreOfficialLogos()" class="px-2.5 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold flex items-center gap-1 shadow-xs transition">
+                            <i class="fa-solid fa-rotate"></i> Restaurar Logos Oficiais do PDF
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                        <div class="sm:col-span-7">
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Estilo do Cabeçalho:</label>
+                            <select id="in_header_style" onchange="updateHeaderStyle()" class="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-medium text-slate-800 outline-none focus:border-blue-600">
+                                <option value="both">Padrão PDF: Brasão (Esq.) + Selo Fiscalização (Dir.)</option>
+                                <option value="left_only">Apenas Brasão de Astolfo Dutra (Esquerda)</option>
+                                <option value="double_crest">Brasão Municipal nos dois lados</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-5 flex flex-col gap-1 pt-1 sm:pt-4">
+                            <div class="flex gap-1.5">
+                                <button type="button" onclick="document.getElementById('inputLogoEsq').click()" class="flex-1 px-2 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-[11px] font-semibold flex items-center justify-center gap-1 transition" title="Enviar imagem PNG/JPG própria para o lado esquerdo">
+                                    <i class="fa-solid fa-upload text-blue-600"></i> Logo Esq.
+                                </button>
+                                <button type="button" onclick="document.getElementById('inputLogoDir').click()" class="flex-1 px-2 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-[11px] font-semibold flex items-center justify-center gap-1 transition" title="Enviar imagem PNG/JPG própria para o lado direito">
+                                    <i class="fa-solid fa-upload text-blue-600"></i> Logo Dir.
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i>
+                        Dica: Você também pode clicar direto sobre as logos na folha ao lado para enviar um arquivo <code class="font-mono">.png/.jpg</code>.
+                    </p>
+                </div>
+
+                <!-- BLOCO 1: DADOS DO ATO ADMINISTRATIVO -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-slate-800 text-white inline-flex items-center justify-center text-[10px]">1</span>
+                            Dados do Ato Administrativo
+                        </h3>
+                        <button type="button" onclick="fillTodayDate()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
+                            <i class="fa-regular fa-calendar-check"></i> Usar data de hoje
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nº do Ato</label>
+                            <input type="text" id="in_num_ato" placeholder="Ex: 042/2026" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none font-mono font-semibold" oninput="syncForm()">
+                        </div>
+                        <div class="sm:col-span-4">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Dia / Mês</label>
+                            <input type="text" id="in_data_dia_mes" placeholder="DD/MM" maxlength="5" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none font-mono" oninput="maskDayMonth(this); syncForm()">
+                        </div>
+                        <div class="sm:col-span-3">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Ano</label>
+                            <input type="text" id="in_data_ano" value="2026" maxlength="4" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none font-mono font-bold text-center" oninput="syncForm()">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Origem da Fiscalização</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                <input type="checkbox" value="Denúncia" class="chk-origem w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                                <span>Denúncia</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                <input type="checkbox" value="Ouvidoria" class="chk-origem w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                                <span>Ouvidoria</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                <input type="checkbox" value="Iniciativa" class="chk-origem w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                                <span>Iniciativa</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                <input type="checkbox" value="Apoio" class="chk-origem w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                                <span>Apoio</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Base Legal</label>
+                        <input type="text" id="in_base_legal" value="Leis Municipais nº 1431/2021, nº 32/2012 e afins." class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()">
+                    </div>
+                </div>
+
+                <!-- BLOCO 2: IDENTIFICAÇÃO DO AUTUADO / PROPRIETÁRIO -->
+                <div class="space-y-3">
+                    <div class="border-b border-slate-200 pb-1.5">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-slate-800 text-white inline-flex items-center justify-center text-[10px]">2</span>
+                            Identificação do Autuado / Proprietário
+                        </h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <div class="sm:col-span-7">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Razão Social / Nome Completo</label>
+                            <input type="text" id="in_nome" placeholder="Nome do proprietário ou empresa" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()">
+                        </div>
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">CPF / CNPJ</label>
+                            <input type="text" id="in_cpf_cnpj" placeholder="000.000.000-00" maxlength="18" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none font-mono" oninput="maskCpfCnpj(this); syncForm()">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <div class="sm:col-span-7">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável</label>
+                            <input type="text" id="in_responsavel" placeholder="Nome do responsável no local" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()">
+                        </div>
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Telefone / WhatsApp</label>
+                            <input type="text" id="in_telefone" placeholder="(32) 99999-9999" maxlength="15" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none font-mono" oninput="maskPhone(this); syncForm()">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <div class="sm:col-span-7">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Logradouro (Rua, Av., Nº)</label>
+                            <input type="text" id="in_logradouro" placeholder="Ex: Rua Direita, nº 120" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()">
+                        </div>
+                        <div class="sm:col-span-5">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Bairro / Distrito</label>
+                            <input type="text" id="in_bairro" placeholder="Ex: Centro" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                        <div class="sm:col-span-6">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Ponto de Referência</label>
+                            <input type="text" id="in_referencia" placeholder="Próximo a..." class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()">
+                        </div>
+                        <div class="sm:col-span-6">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">CEP (Localidade)</label>
+                            <div class="flex flex-wrap gap-1.5">
+                                <label class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" value="36780-000" class="chk-cep w-3.5 h-3.5 accent-blue-600" checked onchange="selectSingleCep(this); syncForm()">
+                                    <span>36780-000 <span class="text-[10px] text-slate-400">(Sede)</span></span>
+                                </label>
+                                <label class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" value="36782-000" class="chk-cep w-3.5 h-3.5 accent-blue-600" onchange="selectSingleCep(this); syncForm()">
+                                    <span>36782-000</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" value="36783-000" class="chk-cep w-3.5 h-3.5 accent-blue-600" onchange="selectSingleCep(this); syncForm()">
+                                    <span>36783-000</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOCO 3: DESCRIÇÃO DAS IRREGULARIDADES / RELATO -->
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-slate-800 text-white inline-flex items-center justify-center text-[10px]">3</span>
+                            Descrição das Irregularidades / Relato
+                        </h3>
+                        <label class="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer select-none">
+                            <input type="checkbox" id="chk_mostrar_pauta" checked onchange="toggleLinedPaper()" class="accent-blue-600 rounded">
+                            <span>Exibir linhas de pauta</span>
+                        </label>
+                    </div>
+
+                    <!-- Modelos Rápidos de Posturas e Obras -->
+                    <div>
+                        <span class="block text-[11px] font-semibold text-slate-500 mb-1.5">Modelos Rápidos de Preenchimento (clique para inserir):</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="insertTemplate('terreno')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-medium transition">
+                                + Terreno Sujo / Mato Alto
+                            </button>
+                            <button type="button" onclick="insertTemplate('calcada')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-medium transition">
+                                + Obstrução de Calçada / Via
+                            </button>
+                            <button type="button" onclick="insertTemplate('entulho')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-medium transition">
+                                + Descarte de Entulho / Lixo
+                            </button>
+                            <button type="button" onclick="insertTemplate('alvara')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-medium transition">
+                                + Funcionamento sem Alvará
+                            </button>
+                            <button type="button" onclick="insertTemplate('obra')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-medium transition">
+                                + Obra Irregular / Sem Licença
+                            </button>
+                        </div>
+                    </div>
+
+                    <textarea id="in_relato" rows="5" placeholder="Descreva detalhadamente a constatação feita pela equipe de fiscalização no local..." class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none resize-y" oninput="syncForm()"></textarea>
+                </div>
+
+                <!-- BLOCO 4: MEDIDAS E PROVIDÊNCIAS ADOTADAS -->
+                <div class="space-y-3">
+                    <div class="border-b border-slate-200 pb-1.5">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-slate-800 text-white inline-flex items-center justify-center text-[10px]">4</span>
+                            Medidas e Providências Adotadas
+                        </h3>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                            <input type="checkbox" value="Notificação Preliminar" class="chk-medida w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                            <span>Notificação Preliminar</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                            <input type="checkbox" value="Multa" class="chk-medida w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                            <span>Multa</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                            <input type="checkbox" value="Apreensão" class="chk-medida w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                            <span>Apreensão</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                            <input type="checkbox" value="Interdição" class="chk-medida w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                            <span>Interdição</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium col-span-2 sm:col-span-2">
+                            <input type="checkbox" value="Cassação / Revogação" class="chk-medida w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                            <span>Cassação / Revogação</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-semibold text-slate-600">Observações Adicionais / Prazo para Regularização</label>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="setObsPrazo('Concede-se o prazo de 05 (cinco) dias úteis para regularização.')" class="text-[11px] text-blue-600 hover:underline">5 dias</button>
+                                <span class="text-slate-300">•</span>
+                                <button type="button" onclick="setObsPrazo('Concede-se o prazo de 10 (dez) dias corridos para regularização.')" class="text-[11px] text-blue-600 hover:underline">10 dias</button>
+                                <span class="text-slate-300">•</span>
+                                <button type="button" onclick="setObsPrazo('Concede-se o prazo de 15 (quinze) dias para regularização.')" class="text-[11px] text-blue-600 hover:underline">15 dias</button>
+                            </div>
+                        </div>
+                        <textarea id="in_observacoes" rows="2" placeholder="Ex: Prazo para cumprimento, informações de protocolo ou envio digital..." class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()"></textarea>
+                    </div>
+                </div>
+
+                <!-- BLOCO 5: EQUIPE DE FISCALIZAÇÃO E ASSINATURAS -->
+                <div class="space-y-3">
+                    <div class="border-b border-slate-200 pb-1.5">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-slate-800 text-white inline-flex items-center justify-center text-[10px]">5</span>
+                            Equipe de Fiscalização e Rodapé
+                        </h3>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Agentes da Fiscalização Participantes</label>
+                        <div class="space-y-1.5">
+                            <label class="flex items-center justify-between p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" value="Túlio Defilippo Ribeiro" class="chk-agente w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                                    <span>Túlio Defilippo Ribeiro</span>
+                                </div>
+                                <button type="button" onclick="setRelator('Túlio Defilippo Ribeiro')" class="text-[11px] text-blue-600 hover:underline font-semibold">Definir como Relator</button>
+                            </label>
+                            <label class="flex items-center justify-between p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" value="José Antônio Claudiano Jr." class="chk-agente w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                                    <span>José Antônio Claudiano Jr.</span>
+                                </div>
+                                <button type="button" onclick="setRelator('José Antônio Claudiano Jr.')" class="text-[11px] text-blue-600 hover:underline font-semibold">Definir como Relator</button>
+                            </label>
+                            <label class="flex items-center justify-between p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs font-medium">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" value="Josué da Silva Rocha" class="chk-agente w-4 h-4 accent-blue-600 rounded" onchange="syncForm()">
+                                    <span>Josué da Silva Rocha</span>
+                                </div>
+                                <button type="button" onclick="setRelator('Josué da Silva Rocha')" class="text-[11px] text-blue-600 hover:underline font-semibold">Definir como Relator</button>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Relator do Ato</label>
+                            <input type="text" id="in_relator" placeholder="Nome do fiscal relator" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none" oninput="syncForm()">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Status de Recebimento (Opcional)</label>
+                            <select id="in_status_assinatura" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:border-blue-600 outline-none bg-white" onchange="syncForm()">
+                                <option value="">Em branco (Para assinatura manual/digital)</option>
+                                <option value="ENVIADO POR MEIO DIGITAL (WHATSAPP / E-MAIL)">Enviado por meio digital (WhatsApp / E-mail)</option>
+                                <option value="RECUSOU-SE A ASSINAR NO ATO DA FISCALIZAÇÃO">Recusou-se a assinar no local</option>
+                                <option value="AUTUADO AUSENTE - NOTIFICAÇÃO ENVIADA">Autuado ausente no momento da vistoria</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Controles de Assinatura na Tela e Personalização de Logos -->
+                    <div class="pt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200">
+                        <div class="flex flex-wrap gap-1.5">
+                            <input type="file" id="inputLogoEsq" accept="image/*" class="hidden" onchange="handleLogoUpload(event, 'esq')">
+                            <input type="file" id="inputLogoDir" accept="image/*" class="hidden" onchange="handleLogoUpload(event, 'dir')">
+                            <button type="button" onclick="forceRestoreOfficialLogos()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-rotate-left text-blue-600"></i> Padrão Oficial
+                            </button>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button type="button" onclick="openSignatureModal('fiscal')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-signature text-blue-600"></i> Assinar (Fiscal)
+                            </button>
+                            <button type="button" onclick="openSignatureModal('recebedor')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-pen-nib text-emerald-600"></i> Assinar (Munícipe)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- COLUNA DIREITA: VISUALIZAÇÃO FIEL A4 (PRONTA PARA PDF / IMPRESSÃO) -->
+        <section class="xl:col-span-7 print-container flex flex-col items-center">
+            
+            <!-- Dica superior da Folha -->
+            <div class="no-print w-full max-w-[210mm] mb-2.5 flex items-center justify-between text-xs text-slate-500 px-1">
+                <span><i class="fa-solid fa-eye mr-1 text-blue-600"></i> Visualização Oficial em Tamanho A4 (210 × 297 mm)</span>
+                <button type="button" onclick="forceRestoreOfficialLogos()" class="text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-arrows-rotate"></i> Forçar atualização das logos
+                </button>
+            </div>
+
+            <div class="a4-preview-wrapper w-full flex justify-center">
+                <!-- PÁGINA A4 OFICIAL -->
+                <div id="a4-document" class="a4-sheet">
+                    
+                    <!-- TOPO + CORPO DO DOCUMENTO -->
+                    <div>
+                        <!-- CABEÇALHO INSTITUCIONAL DA PREFEITURA (FIEL AO PDF ORIGINAL) -->
+                        <div class="border-2 border-slate-900 p-2.5 mb-2 flex items-center justify-between gap-3 bg-white">
+                            
+                            <!-- Logo Esquerda: Brasão Oficial do Município de Astolfo Dutra -->
+                            <div id="header_left_slot" onclick="document.getElementById('inputLogoEsq').click()" title="Clique para enviar uma imagem personalizada ou mantenha o Brasão Oficial" class="w-[84px] h-[84px] flex-shrink-0 flex items-center justify-center cursor-pointer relative group">
+                                <img id="img_logo_esq" class="w-full h-full object-contain" alt="Brasão Oficial de Astolfo Dutra">
+                            </div>
+
+                            <!-- Textos Institucionais Centralizados (Idênticos ao PDF Original) -->
+                            <div class="flex-1 text-center px-1">
+                                <h1 class="text-[13pt] font-extrabold tracking-wide text-slate-900 leading-tight uppercase">
+                                    PREFEITURA MUNICIPAL DE ASTOLFO DUTRA
+                                </h1>
+                                <h2 class="text-[10.5pt] font-bold text-slate-800 tracking-wider uppercase mt-0.5">
+                                    SECRETARIA MUNICIPAL DE SEGURANÇA PÚBLICA
+                                </h2>
+                                <p class="text-[8.5pt] text-slate-700 font-medium mt-1">
+                                    Praça Governador Valadares, 77 - (32) 3541-1385/1498
+                                </p>
+                                <p class="text-[8.5pt] text-slate-700 font-semibold">
+                                    CNPJ 17.702.507/0001-90 - CEP 36780-000 - MG
+                                </p>
+                            </div>
+
+                            <!-- Logo Direita: Selo da Fiscalização Municipal - Prefeitura de Astolfo Dutra -->
+                            <div id="header_right_slot" onclick="document.getElementById('inputLogoDir').click()" title="Clique para enviar uma imagem personalizada ou mantenha o Selo Oficial" class="w-[84px] h-[84px] flex-shrink-0 flex items-center justify-center cursor-pointer relative group">
+                                <img id="img_logo_dir" class="w-full h-full object-contain" alt="Fiscalização Municipal Astolfo Dutra">
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO 1: DADOS DO ATO ADMINISTRATIVO -->
+                        <div class="doc-section-title">DADOS DO ATO ADMINISTRATIVO</div>
+                        <div class="doc-box">
+                            <div class="doc-row">
+                                <div class="doc-cell w-[26%]">
+                                    <span class="doc-label">Nº do Ato:</span>
+                                    <div id="out_num_ato" class="doc-value font-mono font-bold text-[10.5pt]"></div>
+                                </div>
+                                <div class="doc-cell w-[24%]">
+                                    <span class="doc-label">Data / Ano:</span>
+                                    <div class="doc-value font-mono">
+                                        <span id="out_data_dia_mes">____/____</span> / <span id="out_data_ano">2026</span>
+                                    </div>
+                                </div>
+                                <div class="doc-cell w-[50%]">
+                                    <span class="doc-label">Origem:</span>
+                                    <div class="flex flex-wrap items-center gap-y-1 pt-0.5">
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-origem', 'Denúncia')">
+                                            <span id="box_orig_Denúncia" class="pdf-checkbox-box"></span>
+                                            <span>Denúncia</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-origem', 'Ouvidoria')">
+                                            <span id="box_orig_Ouvidoria" class="pdf-checkbox-box"></span>
+                                            <span>Ouvidoria</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-origem', 'Iniciativa')">
+                                            <span id="box_orig_Iniciativa" class="pdf-checkbox-box"></span>
+                                            <span>Iniciativa</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-origem', 'Apoio')">
+                                            <span id="box_orig_Apoio" class="pdf-checkbox-box"></span>
+                                            <span>Apoio</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="doc-row">
+                                <div class="doc-cell w-full">
+                                    <span class="doc-label">Base Legal:</span>
+                                    <div id="out_base_legal" class="doc-value">Leis Municipais nº 1431/2021, nº 32/2012 e afins.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO 2: IDENTIFICAÇÃO DO AUTUADO / PROPRIETÁRIO -->
+                        <div class="doc-section-title">IDENTIFICAÇÃO DO AUTUADO / PROPRIETÁRIO</div>
+                        <div class="doc-box">
+                            <div class="doc-row">
+                                <div class="doc-cell w-[65%]">
+                                    <span class="doc-label">Razão / Nome:</span>
+                                    <div id="out_nome" class="doc-value"></div>
+                                </div>
+                                <div class="doc-cell w-[35%]">
+                                    <span class="doc-label">CPF / CNPJ:</span>
+                                    <div id="out_cpf_cnpj" class="doc-value font-mono"></div>
+                                </div>
+                            </div>
+                            <div class="doc-row">
+                                <div class="doc-cell w-[65%]">
+                                    <span class="doc-label">Responsável:</span>
+                                    <div id="out_responsavel" class="doc-value"></div>
+                                </div>
+                                <div class="doc-cell w-[35%]">
+                                    <span class="doc-label">Telefone:</span>
+                                    <div id="out_telefone" class="doc-value font-mono"></div>
+                                </div>
+                            </div>
+                            <div class="doc-row">
+                                <div class="doc-cell w-[65%]">
+                                    <span class="doc-label">Logradouro:</span>
+                                    <div id="out_logradouro" class="doc-value"></div>
+                                </div>
+                                <div class="doc-cell w-[35%]">
+                                    <span class="doc-label">Bairro:</span>
+                                    <div id="out_bairro" class="doc-value"></div>
+                                </div>
+                            </div>
+                            <div class="doc-row">
+                                <div class="doc-cell w-[52%]">
+                                    <span class="doc-label">Referência:</span>
+                                    <div id="out_referencia" class="doc-value"></div>
+                                </div>
+                                <div class="doc-cell w-[48%]">
+                                    <span class="doc-label">CEP:</span>
+                                    <div class="flex flex-wrap items-center gap-y-1 pt-0.5">
+                                        <div class="pdf-checkbox" onclick="toggleCepFromPreview('36780-000')">
+                                            <span id="box_cep_36780-000" class="pdf-checkbox-box checked">✕</span>
+                                            <span class="font-mono text-[8.5pt]">36780-000</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCepFromPreview('36782-000')">
+                                            <span id="box_cep_36782-000" class="pdf-checkbox-box"></span>
+                                            <span class="font-mono text-[8.5pt]">36782-000</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCepFromPreview('36783-000')">
+                                            <span id="box_cep_36783-000" class="pdf-checkbox-box"></span>
+                                            <span class="font-mono text-[8.5pt]">36783-000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO 3: DESCRIÇÃO DAS IRREGULARIDADES / RELATO -->
+                        <div class="doc-section-title">DESCRIÇÃO DAS IRREGULARIDADES / RELATO</div>
+                        <div class="doc-box">
+                            <div class="p-2">
+                                <div id="out_relato" class="lined-paper font-medium text-slate-900"></div>
+                            </div>
+                            <div class="bg-slate-100 border-t-2 border-slate-900 py-1 px-2 text-center" style="-webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;">
+                                <span class="text-[8.5pt] font-extrabold tracking-wider text-slate-900 uppercase">
+                                    O NÃO CUMPRIMENTO DAS MEDIDAS PODERÁ GERAR MULTAS.
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO 4: MEDIDAS E PROVIDÊNCIAS ADOTADAS -->
+                        <div class="doc-section-title">MEDIDAS E PROVIDÊNCIAS ADOTADAS</div>
+                        <div class="doc-box">
+                            <div class="doc-row">
+                                <div class="doc-cell w-full py-1.5">
+                                    <div class="flex flex-wrap items-center justify-between gap-y-1">
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-medida', 'Notificação Preliminar')">
+                                            <span id="box_med_Notificação Preliminar" class="pdf-checkbox-box"></span>
+                                            <span>Notificação Preliminar</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-medida', 'Multa')">
+                                            <span id="box_med_Multa" class="pdf-checkbox-box"></span>
+                                            <span>Multa</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-medida', 'Apreensão')">
+                                            <span id="box_med_Apreensão" class="pdf-checkbox-box"></span>
+                                            <span>Apreensão</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-medida', 'Interdição')">
+                                            <span id="box_med_Interdição" class="pdf-checkbox-box"></span>
+                                            <span>Interdição</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-medida', 'Cassação / Revogação')">
+                                            <span id="box_med_Cassação / Revogação" class="pdf-checkbox-box"></span>
+                                            <span>Cassação / Revogação</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="doc-row">
+                                <div class="doc-cell w-full">
+                                    <span class="doc-label">Observações Adicionais:</span>
+                                    <div id="out_observacoes" class="doc-value min-h-[34px] whitespace-pre-wrap"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO 5: EQUIPE DE FISCALIZAÇÃO -->
+                        <div class="doc-section-title">EQUIPE DE FISCALIZAÇÃO</div>
+                        <div class="doc-box">
+                            <div class="doc-row">
+                                <div class="doc-cell w-full py-1.5">
+                                    <span class="doc-label mb-1">Agentes da Fiscalização:</span>
+                                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-agente', 'Túlio Defilippo Ribeiro')">
+                                            <span id="box_age_Túlio Defilippo Ribeiro" class="pdf-checkbox-box"></span>
+                                            <span>Túlio Defilippo Ribeiro</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-agente', 'José Antônio Claudiano Jr.')">
+                                            <span id="box_age_José Antônio Claudiano Jr." class="pdf-checkbox-box"></span>
+                                            <span>José Antônio Claudiano Jr.</span>
+                                        </div>
+                                        <div class="pdf-checkbox" onclick="toggleCheckboxFromPreview('chk-agente', 'Josué da Silva Rocha')">
+                                            <span id="box_age_Josué da Silva Rocha" class="pdf-checkbox-box"></span>
+                                            <span>Josué da Silva Rocha</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="doc-row">
+                                <div class="doc-cell w-full">
+                                    <span class="doc-label">Relator do Ato:</span>
+                                    <div id="out_relator" class="doc-value"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RODAPÉ DE ASSINATURAS (LIMPO, SEM CARIMBO INFERIOR) -->
+                    <div class="pt-4 pb-2">
+                        <div class="grid grid-cols-2 items-end gap-12 px-4">
+                            
+                            <!-- Assinatura do Fiscal / Relator -->
+                            <div class="flex flex-col items-center text-center">
+                                <div class="h-16 w-full flex flex-col items-center justify-end relative">
+                                    <img id="img_sig_fiscal" class="max-h-14 object-contain hidden mb-0.5" alt="Assinatura Fiscal">
+                                    <div id="out_sig_fiscal_nome" class="text-[8pt] font-bold text-slate-700"></div>
+                                </div>
+                                <div class="w-full border-t-[1.5px] border-slate-900 pt-1.5">
+                                    <span class="text-[8pt] font-extrabold uppercase tracking-wider text-slate-900 block">
+                                        ASSINATURA DO FISCAL/RELATOR
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Assinatura do Recebedor / Responsável -->
+                            <div class="flex flex-col items-center text-center">
+                                <div class="h-16 w-full flex flex-col items-center justify-end relative">
+                                    <img id="img_sig_recebedor" class="max-h-14 object-contain hidden mb-0.5" alt="Assinatura Recebedor">
+                                    <div id="out_status_assinatura" class="text-[7.5pt] font-bold text-slate-700 px-2 uppercase"></div>
+                                </div>
+                                <div class="w-full border-t-[1.5px] border-slate-900 pt-1.5">
+                                    <span class="text-[8pt] font-extrabold uppercase tracking-wider text-slate-900 block">
+                                        ASSINATURA DO RECEBEDOR/RESPONSÁVEL
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DE ASSINATURA DIGITAL NA TELA -->
+    <div id="signatureModal" class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
+                <h3 id="sigModalTitle" class="font-bold text-sm">Desenhar Assinatura</h3>
+                <button onclick="closeSignatureModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-5">
+                <p class="text-xs text-slate-500 mb-2">Assine no quadro abaixo utilizando o mouse ou o dedo na tela:</p>
+                <div class="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 overflow-hidden">
+                    <canvas id="sigCanvas" width="400" height="170" class="w-full h-[170px] cursor-crosshair touch-none"></canvas>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                    <button type="button" onclick="clearSigCanvas()" class="px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 transition">
+                        <i class="fa-solid fa-eraser mr-1"></i> Limpar Quadro
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeSignatureModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">
+                            Cancelar
+                        </button>
+                        <button type="button" onclick="applySignature()" class="px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow">
+                            Inserir no Documento
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE HISTÓRICO DE FICHAS SALVAS -->
+    <div id="historyModal" class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-amber-400"></i>
+                    <h3 class="font-bold text-sm uppercase tracking-wider">Fichas de Fiscalização Salvas no Navegador</h3>
+                </div>
+                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-5 max-h-[70vh] overflow-y-auto">
+                <div id="historyList" class="space-y-2.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO DE LIMPEZA -->
+    <div id="confirmResetModal" class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 p-5 text-center">
+            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-file-circle-plus text-xl"></i>
+            </div>
+            <h3 class="font-bold text-slate-900 text-base">Iniciar Nova Ficha?</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-5">Todos os campos atuais serão limpos para o preenchimento de um novo ato administrativo.</p>
+            <div class="flex justify-center gap-2">
+                <button onclick="closeResetConfirm()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Cancelar</button>
+                <button onclick="executeFormReset()" class="px-4 py-2 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white">Sim, Limpar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST DE NOTIFICAÇÃO -->
+    <div id="toast" class="no-print fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs font-semibold flex items-center gap-2.5 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toastMsg">Operação realizada!</span>
+    </div>
+
+    <script>
+        // Textos-padrão de apoio baseados no Código de Posturas e Obras de Astolfo Dutra
+        const RELATO_TEMPLATES = {
+            terreno: "Constatou-se em vistoria que o terreno/imóvel acima identificado encontra-se sem a devida limpeza, com acúmulo de vegetação alta (mato) e/ou resíduos, propiciando a proliferação de animais peçonhentos e vetores. Determina-se a capina, limpeza geral do lote e remoção dos resíduos, nos termos da legislação municipal vigente.",
+            calcada: "Constatou-se a obstrução do passeio público (calçada) e/ou via pública com materiais de construção, entulhos ou objetos que impedem o livre e seguro trânsito de pedestres. Determina-se a desobstrução e limpeza imediata da área pública.",
+            entulho: "Verificou-se o depósito/descarte irregular de entulhos, restos de obras, galhadas ou lixo em logradouro público em frente ao imóvel supracitado. O responsável fica notificado a providenciar a retirada adequada e destinação correta do material.",
+            alvara: "Constatou-se que o estabelecimento encontra-se em funcionamento sem a apresentação do respectivo Alvará de Localização e Funcionamento atualizado expedido pela Prefeitura Municipal de Astolfo Dutra. Fica intimado a comparecer ao setor competente para regularização.",
+            obra: "Verificou-se a execução de obra/construção ou intervenção sem o devido Alvará/Licença de Construção Municipal visível no local e/ou em desacordo com as normas urbanísticas municipais (Leis Municipais nº 1431/2021 e nº 32/2012)."
+        };
+
+        // ============================================================================
+        // GERAÇÃO EM ALTA DEFINIÇÃO (CANVAS -> PNG DATA URL) DAS LOGOS OFICIAIS V3
+        // Isso garante 100% de compatibilidade no navegador E no html2pdf, além de
+        // substituir imediatamente qualquer logo antiga que estivesse em cache.
+        // ============================================================================
+        const LOGO_V3_ESQ_KEY = 'astolfo_dutra_ficha_v3_logo_left';
+        const LOGO_V3_DIR_KEY = 'astolfo_dutra_ficha_v3_logo_right';
+
+        const SVG_BRASAO_ASTOLFO_DUTRA = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 210" width="400" height="420">
+            <defs>
+                <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#1d4ed8"/>
+                    <stop offset="100%" stop-color="#2563eb"/>
+                </linearGradient>
+                <linearGradient id="fieldGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#16a34a"/>
+                    <stop offset="100%" stop-color="#15803d"/>
+                </linearGradient>
+                <clipPath id="iberianShield">
+                    <path d="M 48,46 L 152,46 L 152,108 C 152,146 100,168 100,168 C 100,168 48,146 48,108 Z"/>
+                </clipPath>
+            </defs>
+
+            <!-- Ramos de Café Laterais -->
+            <g stroke="#14532d" stroke-width="3.5" fill="none" stroke-linecap="round">
+                <path d="M 48,166 C 18,134 15,82 36,44"/>
+                <path d="M 152,166 C 182,134 185,82 164,44"/>
+            </g>
+            <!-- Folhas Verdes dos Ramos -->
+            <g fill="#16a34a" stroke="#14532d" stroke-width="1.3">
+                <ellipse cx="23" cy="132" rx="10" ry="5" transform="rotate(-35 23 132)"/>
+                <ellipse cx="18" cy="105" rx="10" ry="5" transform="rotate(-20 18 105)"/>
+                <ellipse cx="22" cy="78" rx="10" ry="5" transform="rotate(-10 22 78)"/>
+                <ellipse cx="31" cy="54" rx="9" ry="4.5" transform="rotate(12 31 54)"/>
+                <ellipse cx="38" cy="116" rx="8.5" ry="4.2" transform="rotate(28 38 116)"/>
+                <ellipse cx="35" cy="90" rx="8.5" ry="4.2" transform="rotate(32 35 90)"/>
+
+                <ellipse cx="177" cy="132" rx="10" ry="5" transform="rotate(35 177 132)"/>
+                <ellipse cx="182" cy="105" rx="10" ry="5" transform="rotate(20 182 105)"/>
+                <ellipse cx="178" cy="78" rx="10" ry="5" transform="rotate(10 178 78)"/>
+                <ellipse cx="169" cy="54" rx="9" ry="4.5" transform="rotate(-12 169 54)"/>
+                <ellipse cx="162" cy="116" rx="8.5" ry="4.2" transform="rotate(-28 162 116)"/>
+                <ellipse cx="165" cy="90" rx="8.5" ry="4.2" transform="rotate(-32 165 90)"/>
+            </g>
+            <!-- Grãos de Café Maduros -->
+            <g fill="#dc2626" stroke="#7f1d1d" stroke-width="0.8">
+                <circle cx="28" cy="120" r="3.5"/><circle cx="25" cy="93" r="3.5"/><circle cx="29" cy="67" r="3.2"/>
+                <circle cx="172" cy="120" r="3.5"/><circle cx="175" cy="93" r="3.5"/><circle cx="171" cy="67" r="3.2"/>
+            </g>
+
+            <!-- Coroa Mural Prateada de 5 Torres -->
+            <g fill="#e2e8f0" stroke="#0f172a" stroke-width="2.2" stroke-linejoin="round">
+                <path d="M 50,45 L 50,20 L 62,20 L 62,28 L 72,28 L 72,17 L 88,17 L 88,26 L 94,26 L 94,15 L 106,15 L 106,26 L 112,26 L 112,17 L 128,17 L 128,28 L 138,28 L 138,20 L 150,20 L 150,45 Z"/>
+                <rect x="52" y="38" width="96" height="6" fill="#94a3b8"/>
+                <rect x="55" y="27" width="4.5" height="8" fill="#0f172a"/>
+                <rect x="77.5" y="24" width="5" height="10" fill="#0f172a"/>
+                <rect x="97.5" y="23" width="5" height="11" fill="#0f172a"/>
+                <rect x="117.5" y="24" width="5" height="10" fill="#0f172a"/>
+                <rect x="140.5" y="27" width="4.5" height="8" fill="#0f172a"/>
+            </g>
+
+            <!-- Interior do Escudo Heráldico -->
+            <g clip-path="url(#iberianShield)">
+                <rect x="48" y="46" width="104" height="66" fill="url(#skyGrad)"/>
+                <rect x="48" y="112" width="104" height="60" fill="url(#fieldGrad)"/>
+                <!-- Serras de Minas -->
+                <polygon points="48,112 78,78 108,112" fill="#38bdf8" opacity="0.45"/>
+                <polygon points="84,112 118,72 154,112" fill="#0284c7" opacity="0.55"/>
+                <!-- Faixa Diagonal Branca -->
+                <path d="M 44,62 L 156,130 L 156,114 L 44,46 Z" fill="#ffffff" stroke="#0f172a" stroke-width="1.2"/>
+                <!-- Estrela Dourada -->
+                <polygon points="100,56 104.5,68 117,68 107,75.5 111,87.5 100,80 89,87.5 93,75.5 83,68 95.5,68" fill="#facc15" stroke="#0f172a" stroke-width="1.4"/>
+                <!-- Rio Pomba na Base -->
+                <path d="M 48,136 Q 74,127 100,136 T 152,136 L 152,148 Q 126,139 100,148 T 48,148 Z" fill="#38bdf8"/>
+            </g>
+
+            <!-- Contorno Forte do Escudo -->
+            <path d="M 48,46 L 152,46 L 152,108 C 152,146 100,168 100,168 C 100,168 48,146 48,108 Z" fill="none" stroke="#0f172a" stroke-width="3.6"/>
+
+            <!-- Listel Vermelho com "ASTOLFO DUTRA" -->
+            <path d="M 18,170 Q 100,194 182,170 L 176,190 Q 100,212 24,190 Z" fill="#dc2626" stroke="#0f172a" stroke-width="2.4"/>
+            <text x="100" y="187" font-size="13.5" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" letter-spacing="0.8">ASTOLFO DUTRA</text>
+        </svg>`;
+
+        const SVG_SELO_FISCALIZACAO = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
+            <defs>
+                <path id="topArcV3" d="M 28,100 A 72,72 0 1,1 172,100"/>
+                <path id="botArcV3" d="M 172,100 A 72,72 0 1,1 28,100"/>
+            </defs>
+            <circle cx="100" cy="100" r="94" fill="#ffffff" stroke="#0f172a" stroke-width="4.5"/>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="#1e3a8a" stroke-width="2"/>
+            <circle cx="100" cy="100" r="57" fill="#1e3a8a" stroke="#0f172a" stroke-width="3"/>
+
+            <text font-size="11" font-weight="900" fill="#0f172a" font-family="Arial, Helvetica, sans-serif" letter-spacing="0.9">
+                <textPath href="#topArcV3" startOffset="50%" text-anchor="middle">PREFEITURA DE ASTOLFO DUTRA</textPath>
+            </text>
+            <text font-size="10.8" font-weight="900" fill="#0f172a" font-family="Arial, Helvetica, sans-serif" letter-spacing="0.8">
+                <textPath href="#botArcV3" startOffset="50%" text-anchor="middle">★ FISCALIZAÇÃO MUNICIPAL ★</textPath>
+            </text>
+
+            <!-- Escudo Interno -->
+            <path d="M 75,70 L 125,70 L 125,102 C 125,123 100,136 100,136 C 100,136 75,123 75,102 Z" fill="#ffffff" stroke="#facc15" stroke-width="3.2"/>
+            <text x="100" y="97" font-size="15" font-weight="900" fill="#0f172a" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">PMAD</text>
+            <text x="100" y="113" font-size="9.5" font-weight="800" fill="#1e3a8a" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">FISCAL</text>
+        </svg>`;
+
+        function svgToDataUrl(svgString) {
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString.trim());
+        }
+
+        // Remove quaisquer chaves antigas do localStorage para nunca carregar logos velhas
+        function purgeLegacyLogoCache() {
+            const legacyKeys = [
+                'astolfo_dutra_custom_logo_esq',
+                'astolfo_dutra_custom_logo_dir',
+                'logoLeft',
+                'logoRight',
+                'customLogoLeft',
+                'customLogoRight',
+                'ficha_logo_esq',
+                'ficha_logo_dir'
+            ];
+            legacyKeys.forEach(k => localStorage.removeItem(k));
+        }
+
+        // Inicialização ao carregar a página
+        window.addEventListener('DOMContentLoaded', () => {
+            purgeLegacyLogoCache();
+            fillTodayDate();
+            renderHeaderLogos();
+            syncForm();
+            updateSavedCount();
+            initSignatureCanvas();
+        });
+
+        // Renderiza imediatamente as logos oficiais V3 ou customizadas da versão V3
+        function renderHeaderLogos() {
+            const customEsq = localStorage.getItem(LOGO_V3_ESQ_KEY);
+            const customDir = localStorage.getItem(LOGO_V3_DIR_KEY);
+            const style = document.getElementById('in_header_style') ? document.getElementById('in_header_style').value : 'both';
+
+            const imgEsq = document.getElementById('img_logo_esq');
+            const imgDir = document.getElementById('img_logo_dir');
+            const rightSlot = document.getElementById('header_right_slot');
+
+            const defaultBrasaoUrl = svgToDataUrl(SVG_BRASAO_ASTOLFO_DUTRA);
+            const defaultSeloUrl = svgToDataUrl(SVG_SELO_FISCALIZACAO);
+
+            imgEsq.src = customEsq || defaultBrasaoUrl;
+
+            if (style === 'left_only') {
+                rightSlot.style.visibility = 'hidden';
+            } else if (style === 'double_crest') {
+                rightSlot.style.visibility = 'visible';
+                imgDir.src = customDir || defaultBrasaoUrl;
+            } else {
+                rightSlot.style.visibility = 'visible';
+                imgDir.src = customDir || defaultSeloUrl;
+            }
+        }
+
+        function updateHeaderStyle() {
+            renderHeaderLogos();
+            showToast('Estilo do cabeçalho atualizado!');
+        }
+
+        function forceRestoreOfficialLogos() {
+            purgeLegacyLogoCache();
+            localStorage.removeItem(LOGO_V3_ESQ_KEY);
+            localStorage.removeItem(LOGO_V3_DIR_KEY);
+            if (document.getElementById('in_header_style')) {
+                document.getElementById('in_header_style').value = 'both';
+            }
+            renderHeaderLogos();
+            showToast('Logos oficiais do PDF restauradas!');
+        }
+
+        // Preenche automaticamente Dia/Mês e Ano atuais
+        function fillTodayDate() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('in_data_dia_mes').value = `${d}/${m}`;
+            document.getElementById('in_data_ano').value = '2026';
+            syncForm();
+        }
+
+        // Sincroniza todos os inputs com a Folha A4 Oficial em tempo real
+        function syncForm() {
+            const numAto = document.getElementById('in_num_ato').value.trim();
+            const diaMes = document.getElementById('in_data_dia_mes').value.trim();
+            const ano = document.getElementById('in_data_ano').value.trim() || '2026';
+            const baseLegal = document.getElementById('in_base_legal').value;
+            const nome = document.getElementById('in_nome').value;
+            const cpfCnpj = document.getElementById('in_cpf_cnpj').value;
+            const responsavel = document.getElementById('in_responsavel').value;
+            const telefone = document.getElementById('in_telefone').value;
+            const logradouro = document.getElementById('in_logradouro').value;
+            const bairro = document.getElementById('in_bairro').value;
+            const referencia = document.getElementById('in_referencia').value;
+            const relato = document.getElementById('in_relato').value;
+            const observacoes = document.getElementById('in_observacoes').value;
+            const relator = document.getElementById('in_relator').value;
+            const statusAssinatura = document.getElementById('in_status_assinatura').value;
+
+            // Atualiza textos simples
+            document.getElementById('out_num_ato').textContent = numAto;
+            document.getElementById('out_data_dia_mes').textContent = diaMes || '____/____';
+            document.getElementById('out_data_ano').textContent = ano;
+            document.getElementById('out_base_legal').textContent = baseLegal;
+            document.getElementById('out_nome').textContent = nome;
+            document.getElementById('out_cpf_cnpj').textContent = cpfCnpj;
+            document.getElementById('out_responsavel').textContent = responsavel;
+            document.getElementById('out_telefone').textContent = telefone;
+            document.getElementById('out_logradouro').textContent = logradouro;
+            document.getElementById('out_bairro').textContent = bairro;
+            document.getElementById('out_referencia').textContent = referencia;
+            document.getElementById('out_relato').textContent = relato;
+            document.getElementById('out_observacoes').textContent = observacoes;
+            document.getElementById('out_relator').textContent = relator;
+            document.getElementById('out_sig_fiscal_nome').textContent = relator;
+            document.getElementById('out_status_assinatura').textContent = statusAssinatura;
+
+            // Sincroniza Checkboxes de Origem
+            document.querySelectorAll('.chk-origem').forEach(chk => {
+                const box = document.getElementById(`box_orig_${chk.value}`);
+                if (box) {
+                    box.textContent = chk.checked ? '✕' : '';
+                    box.classList.toggle('checked', chk.checked);
+                }
+            });
+
+            // Sincroniza Checkboxes de CEP
+            document.querySelectorAll('.chk-cep').forEach(chk => {
+                const box = document.getElementById(`box_cep_${chk.value}`);
+                if (box) {
+                    box.textContent = chk.checked ? '✕' : '';
+                    box.classList.toggle('checked', chk.checked);
+                }
+            });
+
+            // Sincroniza Checkboxes de Medidas
+            document.querySelectorAll('.chk-medida').forEach(chk => {
+                const box = document.getElementById(`box_med_${chk.value}`);
+                if (box) {
+                    box.textContent = chk.checked ? '✕' : '';
+                    box.classList.toggle('checked', chk.checked);
+                }
+            });
+
+            // Sincroniza Checkboxes de Agentes
+            document.querySelectorAll('.chk-agente').forEach(chk => {
+                const box = document.getElementById(`box_age_${chk.value}`);
+                if (box) {
+                    box.textContent = chk.checked ? '✕' : '';
+                    box.classList.toggle('checked', chk.checked);
+                }
+            });
+        }
+
+        // Permite clicar nos checkboxes diretamente na folha A4 de preview
+        function toggleCheckboxFromPreview(className, value) {
+            const checkboxes = document.querySelectorAll(`.${className}`);
+            checkboxes.forEach(chk => {
+                if (chk.value === value) {
+                    chk.checked = !chk.checked;
+                }
+            });
+            syncForm();
+        }
+
+        function selectSingleCep(clickedCheckbox) {
+            if (clickedCheckbox.checked) {
+                document.querySelectorAll('.chk-cep').forEach(chk => {
+                    if (chk !== clickedCheckbox) chk.checked = false;
+                });
+            }
+        }
+
+        function toggleCepFromPreview(cepValue) {
+            document.querySelectorAll('.chk-cep').forEach(chk => {
+                chk.checked = (chk.value === cepValue) ? !chk.checked : false;
+            });
+            syncForm();
+        }
+
+        function setRelator(nomeAgente) {
+            document.getElementById('in_relator').value = nomeAgente;
+            // Também marca o agente na lista se ainda não estiver marcado
+            document.querySelectorAll('.chk-agente').forEach(chk => {
+                if (chk.value === nomeAgente) chk.checked = true;
+            });
+            syncForm();
+        }
+
+        function setObsPrazo(texto) {
+            const campo = document.getElementById('in_observacoes');
+            campo.value = campo.value ? `${campo.value}\n${texto}` : texto;
+            syncForm();
+        }
+
+        function insertTemplate(key) {
+            const campo = document.getElementById('in_relato');
+            const texto = RELATO_TEMPLATES[key];
+            if (!texto) return;
+            campo.value = campo.value.trim() ? `${campo.value.trim()}\n${texto}` : texto;
+            syncForm();
+            showToast('Modelo de relato inserido!');
+        }
+
+        function toggleLinedPaper() {
+            const showLines = document.getElementById('chk_mostrar_pauta').checked;
+            const outRelato = document.getElementById('out_relato');
+            outRelato.className = showLines
+                ? 'lined-paper font-medium text-slate-900'
+                : 'unlined-paper font-medium text-slate-900';
+        }
+
+        // Upload de Logos Personalizadas na versão V3
+        function handleLogoUpload(event, side) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                if (side === 'esq') {
+                    localStorage.setItem(LOGO_V3_ESQ_KEY, dataUrl);
+                } else {
+                    localStorage.setItem(LOGO_V3_DIR_KEY, dataUrl);
+                }
+                renderHeaderLogos();
+                showToast('Logo personalizada aplicada no cabeçalho!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Máscaras Automáticas (CPF/CNPJ, Telefone, Dia/Mês)
+        function maskCpfCnpj(input) {
+            let v = input.value.replace(/\D/g, '');
+            if (v.length <= 11) {
+                v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            } else {
+                v = v.substring(0, 14);
+                v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+                v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+                v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+                v = v.replace(/(\d{4})(\d)/, '$1-$2');
+            }
+            input.value = v;
+        }
+
+        function maskPhone(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 11);
+            if (v.length > 10) {
+                v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } else if (v.length > 5) {
+                v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+            } else if (v.length > 2) {
+                v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            }
+            input.value = v;
+        }
+
+        function maskDayMonth(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 4);
+            if (v.length >= 3) {
+                v = v.replace(/^(\d{2})(\d{1,2})/, '$1/$2');
+            }
+            input.value = v;
+        }
+
+        // QUADRO DE ASSINATURA DIGITAL (CANVAS)
+        let currentSigTarget = 'fiscal';
+        let sigCanvas, sigCtx, isDrawing = false;
+
+        function initSignatureCanvas() {
+            sigCanvas = document.getElementById('sigCanvas');
+            sigCtx = sigCanvas.getContext('2d');
+            sigCtx.strokeStyle = '#0f172a';
+            sigCtx.lineWidth = 2.2;
+            sigCtx.lineCap = 'round';
+            sigCtx.lineJoin = 'round';
+
+            const getPos = (e) => {
+                const rect = sigCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (clientX - rect.left) * (sigCanvas.width / rect.width),
+                    y: (clientY - rect.top) * (sigCanvas.height / rect.height)
+                };
+            };
+
+            const start = (e) => {
+                e.preventDefault();
+                isDrawing = true;
+                const pos = getPos(e);
+                sigCtx.beginPath();
+                sigCtx.moveTo(pos.x, pos.y);
+            };
+
+            const move = (e) => {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                sigCtx.lineTo(pos.x, pos.y);
+                sigCtx.stroke();
+            };
+
+            const end = () => { isDrawing = false; };
+
+            sigCanvas.addEventListener('mousedown', start);
+            sigCanvas.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', end);
+
+            sigCanvas.addEventListener('touchstart', start, { passive: false });
+            sigCanvas.addEventListener('touchmove', move, { passive: false });
+            sigCanvas.addEventListener('touchend', end);
+        }
+
+        function openSignatureModal(target) {
+            currentSigTarget = target;
+            document.getElementById('sigModalTitle').textContent =
+                target === 'fiscal' ? 'Assinatura do Fiscal / Relator' : 'Assinatura do Recebedor / Munícipe';
+            clearSigCanvas();
+            const modal = document.getElementById('signatureModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSignatureModal() {
+            const modal = document.getElementById('signatureModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function clearSigCanvas() {
+            sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+        }
+
+        function applySignature() {
+            const dataUrl = sigCanvas.toDataURL('image/png');
+            const imgId = currentSigTarget === 'fiscal' ? 'img_sig_fiscal' : 'img_sig_recebedor';
+            const imgEl = document.getElementById(imgId);
+            imgEl.src = dataUrl;
+            imgEl.classList.remove('hidden');
+            closeSignatureModal();
+            showToast('Assinatura aplicada no documento!');
+        }
+
+        // GERAÇÃO E DOWNLOAD DIRETO DO ARQUIVO PDF
+        async function downloadDirectPDF() {
+            const btn = document.getElementById('btnDownloadPdf');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Gerando PDF...</span>';
+
+            const element = document.getElementById('a4-document');
+            const numAto = (document.getElementById('in_num_ato').value || 'SemNumero').replace(/[^a-zA-Z0-9_-]/g, '_');
+            const nomeAutuado = (document.getElementById('in_nome').value || 'Municipe').trim().split(' ')[0].replace(/[^a-zA-Z0-9_-]/g, '');
+            const fileName = `Ficha_Fiscalizacao_Ato_${numAto}_${nomeAutuado}.pdf`;
+
+            // Remove sombra temporariamente para nitidez total no PDF
+            const prevShadow = element.style.boxShadow;
+            element.style.boxShadow = 'none';
+
+            const opt = {
+                margin:       0,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2.5, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+                showToast('PDF baixado com sucesso!');
+            } catch (err) {
+                console.error(err);
+                window.print();
+            } finally {
+                element.style.boxShadow = prevShadow;
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        }
+
+        // SALVAMENTO E HISTÓRICO NO NAVEGADOR (LOCALSTORAGE)
+        const STORAGE_KEY = 'astolfo_dutra_fichas_fiscalizacao_v1';
+
+        function getFormDataObject() {
+            const getChecked = (cls) => Array.from(document.querySelectorAll(`.${cls}:checked`)).map(c => c.value);
+            return {
+                id: Date.now(),
+                savedAt: new Date().toLocaleString('pt-BR'),
+                numAto: document.getElementById('in_num_ato').value,
+                diaMes: document.getElementById('in_data_dia_mes').value,
+                ano: document.getElementById('in_data_ano').value,
+                origens: getChecked('chk-origem'),
+                baseLegal: document.getElementById('in_base_legal').value,
+                nome: document.getElementById('in_nome').value,
+                cpfCnpj: document.getElementById('in_cpf_cnpj').value,
+                responsavel: document.getElementById('in_responsavel').value,
+                telefone: document.getElementById('in_telefone').value,
+                logradouro: document.getElementById('in_logradouro').value,
+                bairro: document.getElementById('in_bairro').value,
+                referencia: document.getElementById('in_referencia').value,
+                ceps: getChecked('chk-cep'),
+                relato: document.getElementById('in_relato').value,
+                medidas: getChecked('chk-medida'),
+                observacoes: document.getElementById('in_observacoes').value,
+                agentes: getChecked('chk-agente'),
+                relator: document.getElementById('in_relator').value,
+                statusAssinatura: document.getElementById('in_status_assinatura').value
+            };
+        }
+
+        function saveCurrentToHistory() {
+            const data = getFormDataObject();
+            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            list.unshift(data);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0, 50)));
+            updateSavedCount();
+            showToast('Ficha salva no histórico do navegador!');
+        }
+
+        function updateSavedCount() {
+            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            document.getElementById('savedCountBadge').textContent = list.length;
+        }
+
+        function openHistoryModal() {
+            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const container = document.getElementById('historyList');
+            if (list.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">Nenhuma ficha salva no histórico ainda.</div>`;
+            } else {
+                container.innerHTML = list.map(item => `
+                    <div class="p-3 rounded-xl border border-slate-200 hover:border-blue-300 bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono font-bold text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800">Ato: ${item.numAto || 'S/N'}</span>
+                                <span class="font-bold text-sm text-slate-800">${item.nome || 'Sem nome informado'}</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">${item.logradouro || 'Endereço não informado'} • Salvo em ${item.savedAt}</p>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="loadFromHistory(${item.id})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold">Carregar</button>
+                            <button onclick="deleteFromHistory(${item.id})" class="px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            const modal = document.getElementById('historyModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeHistoryModal() {
+            const modal = document.getElementById('historyModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function loadFromHistory(id) {
+            const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const item = list.find(x => x.id === id);
+            if (!item) return;
+
+            document.getElementById('in_num_ato').value = item.numAto || '';
+            document.getElementById('in_data_dia_mes').value = item.diaMes || '';
+            document.getElementById('in_data_ano').value = item.ano || '2026';
+            document.getElementById('in_base_legal').value = item.baseLegal || 'Leis Municipais nº 1431/2021, nº 32/2012 e afins.';
+            document.getElementById('in_nome').value = item.nome || '';
+            document.getElementById('in_cpf_cnpj').value = item.cpfCnpj || '';
+            document.getElementById('in_responsavel').value = item.responsavel || '';
+            document.getElementById('in_telefone').value = item.telefone || '';
+            document.getElementById('in_logradouro').value = item.logradouro || '';
+            document.getElementById('in_bairro').value = item.bairro || '';
+            document.getElementById('in_referencia').value = item.referencia || '';
+            document.getElementById('in_relato').value = item.relato || '';
+            document.getElementById('in_observacoes').value = item.observacoes || '';
+            document.getElementById('in_relator').value = item.relator || '';
+            document.getElementById('in_status_assinatura').value = item.statusAssinatura || '';
+
+            const setChecked = (cls, arr) => {
+                document.querySelectorAll(`.${cls}`).forEach(c => {
+                    c.checked = (arr || []).includes(c.value);
+                });
+            };
+            setChecked('chk-origem', item.origens);
+            setChecked('chk-cep', item.ceps);
+            setChecked('chk-medida', item.medidas);
+            setChecked('chk-agente', item.agentes);
+
+            syncForm();
+            closeHistoryModal();
+            showToast('Ficha carregada com sucesso!');
+        }
+
+        function deleteFromHistory(id) {
+            let list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            list = list.filter(x => x.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+            updateSavedCount();
+            openHistoryModal();
+        }
+
+        // LIMPAR / NOVO ATO
+        function resetFormConfirm() {
+            const modal = document.getElementById('confirmResetModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeResetConfirm() {
+            const modal = document.getElementById('confirmResetModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function executeFormReset() {
+            ['in_num_ato', 'in_nome', 'in_cpf_cnpj', 'in_responsavel', 'in_telefone', 'in_logradouro', 'in_bairro', 'in_referencia', 'in_relato', 'in_observacoes', 'in_relator'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('in_base_legal').value = 'Leis Municipais nº 1431/2021, nº 32/2012 e afins.';
+            document.getElementById('in_status_assinatura').value = '';
+            document.querySelectorAll('.chk-origem, .chk-medida, .chk-agente').forEach(c => c.checked = false);
+            document.querySelectorAll('.chk-cep').forEach((c, idx) => c.checked = (idx === 0));
+
+            document.getElementById('img_sig_fiscal').classList.add('hidden');
+            document.getElementById('img_sig_recebedor').classList.add('hidden');
+
+            fillTodayDate();
+            syncForm();
+            closeResetConfirm();
+            showToast('Formulário limpo para um novo ato!');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2800);
+        }
+    </script>
+</body>
+</html>
